@@ -84,7 +84,8 @@ def process(args):
     paths = get_img_paths(args.img)
 
     total_points_list = []
-    for p in tqdm(paths):
+    # for p in tqdm(paths):
+    for p in paths:
         first_point_list = detect.run(p)
         total_points_list.append(first_point_list)
     print(total_points_list)

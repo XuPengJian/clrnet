@@ -48,7 +48,6 @@ class Detect(object):
             out_file = osp.join(out_file, osp.basename(data['img_path']))
         lanes = [lane.to_array(self.cfg) for lane in data['lanes']]
         # print(lanes)
-        y_move = self.cfg.ori_img_h - self.cfg.cut_height
         imshow_lanes(data['ori_img'], lanes, show=self.cfg.show, out_file=out_file)
 
     def run(self, data):
