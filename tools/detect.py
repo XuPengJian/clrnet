@@ -13,6 +13,14 @@ from clrnet.utils.net_utils import load_network
 from pathlib import Path
 from tqdm import tqdm
 
+# 执行脚本命令
+# ../configs/clrnet/clr_resnet18_llamas.py
+# --img
+# ../test_data
+# --load_from
+# ../models/llamas_r18.pth
+# --savedir
+# ../vis
 
 class Detect(object):
     def __init__(self, cfg):
