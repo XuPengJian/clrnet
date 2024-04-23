@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+from PIL import Image
 import cv2
 import os
 import os.path as osp
@@ -12,6 +13,7 @@ from clrnet.utils.visualization import imshow_lanes, get_first_point
 from clrnet.utils.net_utils import load_network
 from pathlib import Path
 from tqdm import tqdm
+
 
 # 执行脚本命令
 # ../configs/clrnet/clr_resnet18_llamas.py
@@ -33,12 +35,23 @@ class Detect(object):
         load_network(self.net, self.cfg.load_from)
 
     def preprocess(self, img_path):
-        ori_img = cv2.imread(img_path)
-        img = ori_img[self.cfg.cut_height:, :, :].astype(np.float32)
+        # 改为PIL来读取图片
+        ori_img = Image.open(img_path)
+        ori_img_np = np.array(ori_img).astype(np.float32)
+        ori_img_cv = cv2.cvtColor(ori_img_np, cv2.COLOR_RGB2BGR)
+
+        img = ori_img_cv[self.cfg.cut_height:, :, :]
         data = {'img': img, 'lanes': []}
         data = self.processes(data)
         data['img'] = data['img'].unsqueeze(0)
-        data.update({'img_path': img_path, 'ori_img': ori_img})
+        data.update({'img_path': img_path, 'ori_img': ori_img_cv})
+
+        # ori_img = cv2.imread(img_path)
+        # img = ori_img[self.cfg.cut_height:, :, :].astype(np.float32)
+        # data = {'img': img, 'lanes': []}
+        # data = self.processes(data)
+        # data['img'] = data['img'].unsqueeze(0)
+        # data.update({'img_path': img_path, 'ori_img': ori_img})
         return data
 
     def inference(self, data):
@@ -69,7 +82,6 @@ class Detect(object):
         return first_point_list
 
 
-
 def get_img_paths(path):
     p = str(Path(path).absolute())  # os-agnostic absolute path
     if '*' in p:
@@ -89,14 +101,22 @@ def process(args):
     cfg.savedir = args.savedir
     cfg.load_from = args.load_from
     detect = Detect(cfg)
-    paths = get_img_paths(args.img)
+    img_folder = args.img
+    save_lanes_txt = args.save_lanes_txt
+    paths = get_img_paths(img_folder)
+    paths.sort()
+    # print(paths)
+    lane_first_points_list = []
 
-    total_points_list = []
-    # for p in tqdm(paths):
-    for p in paths:
+    # 运行检测
+    for p in tqdm(paths):
         first_point_list = detect.run(p)
-        total_points_list.append(first_point_list)
-    print(total_points_list)
+        lane_first_points_list.append(first_point_list)
+
+    # 将结果保存在txt文件夹中
+    if save_lanes_txt is not None:
+        with open(save_lanes_txt, 'w', encoding='utf-8') as file:
+            file.write(str(lane_first_points_list))
 
 
 if __name__ == '__main__':
@@ -106,6 +126,7 @@ if __name__ == '__main__':
     parser.add_argument('--show', action='store_true',
                         help='Whether to show the image')
     parser.add_argument('--savedir', type=str, default=None, help='The root of save directory')
+    parser.add_argument('--save_lanes_txt', type=str, default=None, help='The root of save directory')
     parser.add_argument('--load_from', type=str, default='best.pth', help='The path of model')
     args = parser.parse_args()
     process(args)

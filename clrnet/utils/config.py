@@ -12,6 +12,10 @@ from importlib import import_module
 from addict import Dict
 from yapf.yapflib.yapf_api import FormatCode
 
+# 去掉mmcv的警告
+import warnings
+warnings.filterwarnings('ignore')
+
 BASE_KEY = '_base_'
 DELETE_KEY = '_delete_'
 RESERVED_KEYS = ['filename', 'text', 'pretty_text']
