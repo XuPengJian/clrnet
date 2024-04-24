@@ -108,10 +108,14 @@ def process(args):
     # print(paths)
     lane_first_points_list = []
 
+    # 进度条总长度设置
+    tqdm_bar = tqdm(total=len(paths))
     # 运行检测
-    for p in tqdm(paths):
-        first_point_list = detect.run(p)
-        lane_first_points_list.append(first_point_list)
+    for p in paths:
+        if p.endwith(('jpg', '.png')):
+            first_point_list = detect.run(p)
+            lane_first_points_list.append(first_point_list)
+        tqdm_bar.update(1)
 
     # 将结果保存在txt文件夹中
     if save_lanes_txt is not None:
