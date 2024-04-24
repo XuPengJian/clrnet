@@ -112,7 +112,7 @@ def process(args):
     tqdm_bar = tqdm(total=len(paths))
     # 运行检测
     for p in paths:
-        if p.endwith(('jpg', '.png')):
+        if p.endswith(('jpg', '.png')):
             first_point_list = detect.run(p)
             lane_first_points_list.append(first_point_list)
         tqdm_bar.update(1)
