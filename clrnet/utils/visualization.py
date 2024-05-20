@@ -50,13 +50,9 @@ def get_first_point(lanes):
         lanes_xys.append(xys)
     lanes_xys.sort(key=lambda xys: xys[0][0])
 
-    # 遍历每一条轨迹
+    # 遍历出每一条轨迹
     for idx, xys in enumerate(lanes_xys):
-        # 遍历每一个点
-        for i in range(1, len(xys)):
-            # 看看第一个点的位置是否就是我要的点
-            if i == 1:
-                first_point_list.append(xys[0])
+        first_point_list.append(xys[0])
     return first_point_list
 
 
